@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bhagavatam – The Sacred Scripture Chatbot</title>
+    <meta name="description"
+        content="Bhagavatam is a divine chatbot powered by the Srimad Bhagavatam PDF. Ask questions and receive answers directly from the sacred scripture." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Mandala Background -->
+    <div class="mandala-bg">
+        <div class="mandala mandala-1"></div>
+        <div class="mandala mandala-2"></div>
+        <div class="mandala mandala-3"></div>
+    </div>
+
+    <!-- ===== LANDING / UPLOAD SCREEN ===== -->
+    <div id="landingScreen" class="screen active">
+        <div class="landing-content">
+            <div class="logo-wrapper">
+                <div class="logo-glow"></div>
+                <div class="logo-ring"></div>
+                <img id="logoImg" src="bhagavatam_logo.png" alt="Bhagavatam Logo" class="logo-img" />
+            </div>
+
+            <div class="title-block">
+                <h1 class="app-title">Bhagavatam</h1>
+                <p class="app-subtitle">ॐ नमो भगवते वासुदेवाय</p>
+                <p class="app-description">
+                    The divine mediator between you and the sacred scripture.<br />
+                    Seek wisdom directly from the eternal words of Lord Krishna.
+                </p>
+            </div>
+
+            <div class="action-area" style="text-align: center; margin-top: 20px;">
+                <button class="upload-btn" id="enterBtn" style="font-size: 1.1rem; padding: 16px 48px;">
+                    <span>Enter the Scripture</span>
+                    <div class="btn-shimmer"></div>
+                </button>
+            </div>
+
+            <div class="feature-chips" style="margin-top: 10px;">
+                <div class="chip"><span class="chip-icon">📖</span> Built-in Scripture</div>
+                <div class="chip"><span class="chip-icon">✨</span> Keyword Highlighting</div>
+                <div class="chip"><span class="chip-icon">📍</span> Page Citations</div>
+                <div class="chip"><span class="chip-icon">🔍</span> Smart Matching</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CHAT SCREEN ===== -->
+    <div id="chatScreen" class="screen">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="bhagavatam_logo.png" alt="Logo" class="sidebar-logo-img" />
+                    <div class="sidebar-title-block">
+                        <span class="sidebar-title">Bhagavatam</span>
+                        <span class="sidebar-verse">ॐ नमो भगवते</span>
+                    </div>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sidebar-body">
+                <!-- Scripture Info -->
+                <div class="pdf-info-card" id="pdfInfoCard">
+                    <div class="pdf-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                    </div>
+                    <div class="pdf-details">
+                        <p class="pdf-name" id="pdfName">Srimad Bhagavatam</p>
+                        <p class="pdf-pages" id="pdfPages">Scripture loaded</p>
+                    </div>
+                    <div class="pdf-status-dot"></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-value" id="statPages">12</span>
+                        <span class="stat-label">Cantos</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="statWords">0</span>
+                        <span class="stat-label">Words</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="statQueries">0</span>
+                        <span class="stat-label">Queries</span>
+                    </div>
+                </div>
+
+                <!-- Suggested Questions -->
+                <div class="suggestions-section">
+                    <h3 class="section-label">Sacred Inquiries</h3>
+                    <div class="suggestions-list" id="suggestionsList">
+                        <button class="suggestion-item" data-q="Who is Lord Krishna in Bhagavatam?">Who is Lord
+                            Krishna?</button>
+                        <button class="suggestion-item"
+                            data-q="What is the purpose of human life according to Bhagavatam?">Purpose of human
+                            life</button>
+                        <button class="suggestion-item" data-q="What is Bhakti yoga?">What is Bhakti yoga?</button>
+                        <button class="suggestion-item" data-q="What are the ten subjects of Bhagavatam?">Ten subjects
+                            of Bhagavatam</button>
+                        <button class="suggestion-item" data-q="Who was Parikshit and why was he cursed?">Story of King
+                            Parikshit</button>
+                        <button class="suggestion-item"
+                            data-q="What is the nature of the soul according to Bhagavatam?">Nature of the soul</button>
+                    </div>
+                </div>
+
+                <!-- Search Settings -->
+                <div class="search-settings">
+                    <h3 class="section-label">Search Settings</h3>
+                    <div class="setting-row">
+                        <label class="setting-label">Results per query</label>
+                        <select class="setting-select" id="resultCount">
+                            <option value="3">3 passages</option>
+                            <option value="5" selected>5 passages</option>
+                            <option value="8">8 passages</option>
+                            <option value="10">10 passages</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <label class="setting-label">Search mode</label>
+                        <select class="setting-select" id="searchMode">
+                            <option value="smart" selected>Smart match</option>
+                            <option value="exact">Exact phrase</option>
+                            <option value="any">Any keyword</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="change-pdf-btn" id="changePdfBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Home
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+                <div class="header-title-group">
+                    <h2 class="header-title">Seek Divine Wisdom</h2>
+                    <p class="header-sub" id="headerSub">Ask anything from the Bhagavatam</p>
+                </div>
+                <button class="clear-chat-btn" id="clearChatBtn" title="Clear chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3,6 5,6 21,6" />
+                        <path d="M19,6l-1,14a2 2 0 0 1-2,2H8a2 2 0 0 1-2-2L5,6" />
+                        <path d="M10,11v6M14,11v6" />
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Messages -->
+            <div class="messages-container" id="messagesContainer">
+                <!-- Welcome message injected by JS -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <div class="input-deco">ॐ</div>
+                    <textarea id="userInput" class="user-input" placeholder="Ask a question from the Bhagavatam…"
+                        rows="1" maxlength="500"></textarea>
+                    <button class="send-btn" id="sendBtn" title="Ask">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22,2 15,22 11,13 2,9" />
+                        </svg>
+                    </button>
+                </div>
+                <p class="input-hint">Powered by the sacred texts of Srimad Bhagavatam</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
